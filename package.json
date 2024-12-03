@@ -9,7 +9,7 @@
   "scripts": {
     "start": "node dist/bundle.js",
     "build": "webpack --mode production",
-    "test": "jest --coverage",
+    "test": "npx jest --coverage",
     "test:ci": "jest --ci --coverage"
   }
 }

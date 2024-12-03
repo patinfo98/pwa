@@ -28,11 +28,14 @@ jobs:
 
       # Step 3: Install dependencies from `package.json`
       - name: Install dependencies
-        run: npm install
+        run: npm ci
+
+      - name: Fix Jest permissions
+        run: chmod +x ./node_modules/.bin/jest
 
       # Step 4: Run Jest tests and generate coverage reports
       - name: Run backend tests
-        run: npm test
+        run: npx jest --coverage
 
       # Step 5: Upload the coverage report as an artifact
       - name: Upload coverage report
