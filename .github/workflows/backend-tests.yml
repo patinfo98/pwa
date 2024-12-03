@@ -1,0 +1,40 @@
+name: Backend Tests
+
+# Trigger the workflow on every push or pull request to the `main` branch
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest # The virtual machine to run the workflow on (Ubuntu)
+
+    steps:
+      # Step 1: Check out the repository code from GitHub
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # Step 2: Set up Node.js to use the specified version
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "20" # Specify the version of Node.js to use
+
+      # Step 3: Install dependencies from `package.json`
+      - name: Install dependencies
+        run: npm install
+
+      # Step 4: Run Jest tests and generate coverage reports
+      - name: Run backend tests
+        run: npm test
+
+      # Step 5: Upload the coverage report as an artifact
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage-report # The name of the artifact
+          path: coverage/ # The path to the coverage report directory
