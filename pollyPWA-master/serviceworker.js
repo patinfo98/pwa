@@ -81,6 +81,7 @@ self.addEventListener("install", event => {
 
 // This event is usually used to delete any files that are no longer necessary and clean up after the app in general.
 self.addEventListener("activate", event => {
+  return "Service Worker Lab 05 PWA activating."
   console.log("Service Worker Lab 05 PWA activating.");
 });
 

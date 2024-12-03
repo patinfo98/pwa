@@ -14,12 +14,12 @@
 ## division of tasks
 - testing: 
     -- frontend tests (Selenium): Patrick
-    -- backend tests: Dominik
+    -- backend tests (Jest): Dominik
 - build automation (Github Actions): Susanne
 - test automation: Dana
 - server: Stefan
 
-# ServisworkerTestCases
+# Service Worker Testcases
 
 1. Service Worker Registration
    [ ] Verify that the Service Worker registers successfully.
