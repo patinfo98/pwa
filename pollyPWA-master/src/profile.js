@@ -17,7 +17,7 @@ function displayPosts(){
         `<div id=${count} class="myPost addPollContainer" style="background-color:${poll.color};">
             <div class="postHeader">
                 <div class="postVotes">${poll.votesOne + poll.votesTwo + " votes"}</div>
-                <img id=${"post" + count} src="img/delete.svg" alt="add poll" style="filter: invert(100%); width: 20px;" onClick="deletePost(${count})">
+                <img id=${"post" + count} src="assets/delete.svg" alt="add poll" style="filter: invert(100%); width: 20px;" onClick="deletePost(${count})">
             </div>
             <div class="postDescription">${poll.question}</div>
             <hr class="line">

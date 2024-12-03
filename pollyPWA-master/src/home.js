@@ -84,7 +84,7 @@ function setCardData() {
     elements.bigCardAnswerOne.textContent = cardData.answerOne
     elements.bigCardAnswerTwo.textContent = cardData.answerTwo
     elements.bigCard.style.background = cardData.color
-    elements.bigCardPinButton.src = pinned ? "img/simple_pin_filled.svg" : "img/simple_pin_outline.svg"
+    elements.bigCardPinButton.src = pinned ? "assets/simple_pin_filled.svg" : "assets/simple_pin_outline.svg"
 }
 
 function onCardFinished(voteOption) {

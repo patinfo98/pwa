@@ -16,13 +16,13 @@ async function getData() {
     polls: [],
     user: null,
   }
-  await fetch('data_polls.json')
+  await fetch('data/data_polls.json')
     .then(response => response.json())
     .then(data => {
       returnData.polls = data
     })
     .catch(error => console.error('Error:', error))
-  await fetch('user.json')
+  await fetch('data/user.json')
     .then(response => response.json())
     .then(data => {
       returnData.user = data

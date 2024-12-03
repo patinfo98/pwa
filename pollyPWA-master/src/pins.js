@@ -101,7 +101,7 @@ function createSmallPinContainer(poll) {
     answer1.textContent = poll.answerOne
     answer2.textContent = poll.answerTwo
     voteCount.textContent = poll.votesOne + poll.votesTwo + ' votes'
-    img.src = 'img/simple_pin_filled.svg'
+    img.src = 'assets/simple_pin_filled.svg'
 
     img.addEventListener('click', () => {
         removeFromPinnedPolls(poll.id)
