@@ -1,0 +1,40 @@
+name: Build Project
+
+on:
+  push:
+    branches:
+      - sj
+  pull_request:
+    branches:
+      - sj
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    # Step 1: Checkout code from the repository
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    # Step 2: Set up Node.js (choose version 16 or 18 based on your app's compatibility)
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+
+    # Step 3: Install dependencies (npm or yarn)
+    - name: Install dependencies
+      run: |
+        npm install
+
+    # Step 4: Build the project (use the Parcel build command)
+    - name: Build the project
+      run: |
+        npm run build
+
+    # Step 5: Upload the build artifacts to GitHub (optional)
+    - name: Upload dist to GitHub artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: dist
+        path: dist/

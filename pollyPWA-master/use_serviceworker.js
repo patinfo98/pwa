@@ -9,7 +9,7 @@ LAST CHANGE: 17.10.2023
 if ("serviceWorker" in navigator) {
     window.addEventListener('load', function() {
         navigator.serviceWorker
-            .register("serviceworker.js")
+            .register(new URL("serviceworker.js", import.meta.url))
             .then(serviceWorker => {
                 console.log("Service Worker Lab 05 PWA registered: ", serviceWorker);
             })

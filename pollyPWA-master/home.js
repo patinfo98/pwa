@@ -1,12 +1,23 @@
+// Create the worker
 let initComplete = false;
 let onLoadComplete = false;
+let elements = {}; // Declare the elements object
+const worker = new Worker(new URL('webworker.js', import.meta.url), { type: 'module' });
 
-const onDataFeteched = () => {
-    initComplete = true
-    finishSetup()
-}
+// Function to handle the fetched data
+const onDataFetched = (data) => {
+    initComplete = true;
+    finishSetup(data);
+};
 
-getData(onDataFeteched)
+// Send the "init" message to the worker to begin data fetching
+worker.postMessage('init');
+
+// Listen for data from the worker
+worker.onmessage = function(event) {
+    const data = event.data;
+    onDataFetched(data); // Call the onDataFetched function when data is available
+};
 
 window.onload = function () {
     let ids = [
@@ -27,41 +38,46 @@ window.onload = function () {
         "outOfPollsButton",
     ];
     getElementsById(ids);
-    onLoadComplete = true
-    finishSetup()
-}
+    onLoadComplete = true;
+    finishSetup();
+};
 
 function getElementsById(ids) {
     ids.forEach(id => {
-        elements[id] = document.getElementById(id)
-    })
+        elements[id] = document.getElementById(id);
+    });
 }
 
-function finishSetup() {
-    if (!initComplete || !onLoadComplete) return
-    elements.bigCardAnswerOne.addEventListener("click", function () { onCardFinished(1) })
-    elements.bigCardAnswerTwo.addEventListener("click", function () { onCardFinished(2) })
-    elements.outOfPollsButton.addEventListener("click", function () { resetPolls() })
+function finishSetup(data) {
+    if (!initComplete || !onLoadComplete) return;
+
+    // Use data fetched from the worker in your logic
+    pollList = data.polls;
+    // Continue with the rest of the setup logic...
+    elements.bigCardAnswerOne.addEventListener("click", function () { onCardFinished(1) });
+    elements.bigCardAnswerTwo.addEventListener("click", function () { onCardFinished(2) });
+    elements.outOfPollsButton.addEventListener("click", function () { resetPolls() });
     elements.skipButton.addEventListener("click", function () {
-        addPollToSeen() 
-        getNextCard()
-        updateCards()
+        addPollToSeen(); 
+        getNextCard();
+        updateCards();
         if(currentCard == -1) {
-            showOutOfQuestions()
+            showOutOfQuestions();
         } else {
-            setCardData()
-            showQuestionCard()
+            setCardData();
+            showQuestionCard();
         }
-    })
+    });
     elements.bigCardPinButton.addEventListener("click", function () { 
-        addPollToSeen(true)
-        setCardData()
-        updateCards()
-    })
+        addPollToSeen(true);
+        setCardData();
+        updateCards();
+    });
+
     if(currentCard != -1) {
-        setCardData()
+        setCardData();
     } else {
-        showOutOfQuestions()
+        showOutOfQuestions();
     }
 }
 

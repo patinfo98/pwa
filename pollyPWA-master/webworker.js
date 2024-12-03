@@ -13,20 +13,24 @@ self.addEventListener("message", function (messageEvent) {
 
 async function getData() {
   let returnData = {
-    polls: [],
-    user: null,
+      polls: [],
+      user: null,
+  };
+
+  try {
+      // Fetching the polls data
+      const pollsResponse = await fetch('data_polls.json');
+      if (!pollsResponse.ok) throw new Error('Failed to fetch data_polls.json');
+      returnData.polls = await pollsResponse.json();
+
+      // Fetching the user data
+      const userResponse = await fetch('user.json');
+      if (!userResponse.ok) throw new Error('Failed to fetch user.json');
+      returnData.user = await userResponse.json();
+  } catch (error) {
+      console.error('Error fetching data:', error);
   }
-  await fetch('data_polls.json')
-    .then(response => response.json())
-    .then(data => {
-      returnData.polls = data
-    })
-    .catch(error => console.error('Error:', error))
-  await fetch('user.json')
-    .then(response => response.json())
-    .then(data => {
-      returnData.user = data
-    })
-    .catch(error => console.error('Error:', error))
-  self.postMessage(returnData)
+
+  // Send the data back to the main thread
+  self.postMessage(returnData);
 }

@@ -1,0 +1,24 @@
+{
+  "name": "polly",
+  "version": "1.0.0",
+  "description": "by Muesluem Atas & Mathias Knoll",
+  "scripts": {
+    "start": "npx serve .",
+    "build": "parcel build index.html --dist-dir dist --public-url ."
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@babel/cli": "^7.25.9",
+    "@babel/core": "^7.26.0",
+    "@babel/preset-env": "^7.26.0",
+    "@parcel/packager-raw-url": "^2.13.2",
+    "@parcel/transformer-webmanifest": "^2.13.2",
+    "parcel": "^2.13.2",
+    "serve": "^14.2.4",
+    "svgo": "^3.3.2"
+  },
+  "dependencies": {
+    "polly": "file:"
+  }
+}

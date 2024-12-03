@@ -26,7 +26,7 @@ let currentCard = null
 let user = null
 let onDataFetched = null
 
-const worker = new Worker("webworker.js")
+const worker = new Worker(new URL("webworker.js", import.meta.url));
 
 async function getData(onDataFetchedCallback = null) {
 
