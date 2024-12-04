@@ -10,7 +10,22 @@ describe('Service Worker', () => {
       args: ['--no-sandbox', '--disable-setuid-sandbox']
     });
     page = await browser.newPage();
-    await page.goto('http://localhost:8082');
+    try {
+      await page.goto('http://127.0.0.1:8082', { waitUntil: 'load', timeout: 10000 });
+      
+      const readyState = await page.evaluate(() => {
+        return document.readyState;
+      });
+      
+      if (readyState !== 'complete') {
+        throw new Error('Page did not load completely');
+      }
+  
+      console.log('Page loaded and readyState is complete');
+    } catch (error) {
+      console.error('Error loading page:', error);
+      throw error; 
+    }
   });
 
   afterAll(async () => {
