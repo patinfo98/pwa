@@ -1,6 +1,7 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
 module.exports = {
     mode: 'development',
@@ -16,16 +17,12 @@ module.exports = {
         webworker: './webworker.js'
     },
     output: {
-        filename: '[name].bundle.js',
+        filename: '[name].js',
         path: path.resolve(__dirname, 'dist'),
         clean: true,
     },
     module: {
         rules: [
-            {
-                test: /\.css$/,
-                use: ['style-loader', 'css-loader'],
-            },
             {
                 test: /\.(png|svg|jpg|jpeg|gif|ico)$/i,
                 type: 'asset/resource',
@@ -64,6 +61,18 @@ module.exports = {
             template: './profile.html',
             filename: 'profile.html',
             chunks: ['profile', 'main', 'use_serviceworker']
+        }),
+        new MiniCssExtractPlugin({
+            filename: "css/style.css"
+        }),
+        new CopyWebpackPlugin({
+            patterns: [
+                { from: path.resolve(__dirname, 'data_polls.json'), to: 'data_polls.json' }, 
+                { from: path.resolve(__dirname, 'user.json'), to: 'user.json' },
+                { from: 'serviceworker.js', to: 'serviceworker.js' },
+                { from: 'manifest.json', to: 'manifest.json' },
+        
+            ],
         }),
     ],
     devServer: {
