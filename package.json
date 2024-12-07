@@ -2,14 +2,29 @@
   "name": "pollypwa-master",
   "version": "1.0.0",
   "description": "- feature branches\r -- pull requests with one approval\r - documentation\r - build automation\r - test automation \r - continious deployment\r - security \r -- (no upload of passwords/keys)\r -- https",
-  "main": "main.js",
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "start": "webpack serve --open",
+    "build": "webpack"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@babel/core": "^7.26.0",
+    "@babel/preset-env": "^7.26.0",
+    "babel-loader": "^9.2.1",
+    "css-loader": "^7.1.2",
+    "html-loader": "^5.1.0",
     "jest": "^29.7.0",
-    "puppeteer": "^23.9.0"
+    "puppeteer": "^23.9.0",
+    "style-loader": "^4.0.0",
+    "webpack-cli": "^5.1.4",
+    "webpack-dev-server": "^5.1.0"
+  },
+  "dependencies": {
+    "copy-webpack-plugin": "^12.0.2",
+    "html-webpack-plugin": "^5.6.3",
+    "mini-css-extract-plugin": "^2.9.2",
+    "pollypwa-master": "file:"
   }
 }
