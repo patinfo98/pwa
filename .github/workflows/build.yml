@@ -1,0 +1,35 @@
+name: Build Project
+
+on:
+  push:
+    branches:
+      - main
+      - sj
+  pull_request:
+    branches:
+      - main
+      - sj
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Build the project
+      run: npm run build
+
+    - name: Upload dist to GitHub artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: dist
+        path: dist/

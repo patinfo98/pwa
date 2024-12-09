@@ -1,0 +1,56 @@
+{
+    "taskDefinitionArn": "arn:aws:ecs:eu-central-1:740581236379:task-definition/polly-ecs-def:3",
+    "containerDefinitions": [
+        {
+            "name": "polly-container",
+            "image": "740581236379.dkr.ecr.eu-central-1.amazonaws.com/polly-ecr-repo:latest",
+            "cpu": 256,
+            "memory": 512,
+            "portMappings": [
+                {
+                    "containerPort": 8080,
+                    "hostPort": 8080,
+                    "protocol": "tcp"
+                }
+            ],
+            "essential": true,
+            "environment": [],
+            "mountPoints": [],
+            "volumesFrom": [],
+            "systemControls": []
+        }
+    ],
+    "family": "polly-ecs-def",
+    "executionRoleArn": "arn:aws:iam::740581236379:role/ecsTaskExecutionRole",
+    "networkMode": "awsvpc",
+    "revision": 3,
+    "volumes": [],
+    "status": "ACTIVE",
+    "requiresAttributes": [
+        {
+            "name": "com.amazonaws.ecs.capability.ecr-auth"
+        },
+        {
+            "name": "ecs.capability.execution-role-ecr-pull"
+        },
+        {
+            "name": "com.amazonaws.ecs.capability.docker-remote-api.1.18"
+        },
+        {
+            "name": "ecs.capability.task-eni"
+        }
+    ],
+    "placementConstraints": [],
+    "compatibilities": [
+        "EC2",
+        "FARGATE"
+    ],
+    "requiresCompatibilities": [
+        "FARGATE"
+    ],
+    "cpu": "256",
+    "memory": "512",
+    "registeredAt": "2024-12-07T12:58:50.333Z",
+    "registeredBy": "arn:aws:iam::740581236379:root",
+    "tags": []
+}
