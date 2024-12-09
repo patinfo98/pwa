@@ -35,8 +35,9 @@ jobs:
 
       # Step 4: Run Jest tests and generate coverage reports
       - name: Run backend tests
-        run: npx jest --coverage
-
+        run: npx http-server -p 8082 &
+          npx wait-on http://127.0.0.1:8082
+          npx jest --coverage
       # Step 5: Upload the coverage report as an artifact
       - name: Upload coverage report
         uses: actions/upload-artifact@v3
