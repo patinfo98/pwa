@@ -1,12 +1,11 @@
 const puppeteer = require('puppeteer');
-jest.useRealTimers();
 describe('Polly PWA Tests', () => {
     let page;
     let browser;
   
     beforeAll(async () => {
         browser = await puppeteer.launch({
-            headless: true,
+            headless: false,
             args: ['--no-sandbox', '--disable-setuid-sandbox']
         });
         page = await browser.newPage();

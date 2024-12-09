@@ -38,7 +38,6 @@ var filesToCache = [
   'data_polls.json',
   'favicon.ico',
   'index.html',
-  'home.js',
   'pins.html',
   'pins.js',
   'img/add.svg',
