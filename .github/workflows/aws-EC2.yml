@@ -52,6 +52,9 @@ jobs:
       env:
         SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
       run: |
+        # Debug: Prüfe ob tar-Datei existiert
+        ls -la deployment.tar.gz
+        
         # Write the SSH key to a file
         echo "$SSH_PRIVATE_KEY" > deploy_key
         chmod 600 deploy_key
@@ -60,28 +63,40 @@ jobs:
         TIMESTAMP=$(date +%Y%m%d_%H%M%S)
         RELEASE_DIR=${{ env.DEPLOY_PATH }}/releases/$TIMESTAMP
         
-        # Upload and deploy
-        scp -i deploy_key -o StrictHostKeyChecking=no deployment.tar.gz ${{ env.SSH_USER }}@${{ env.EC2_HOST }}:/tmp/
+        echo "Uploading to ${{ env.SSH_USER }}@${{ env.EC2_HOST }}"
         
+        # Upload with verbose flag
+        scp -v -i deploy_key -o StrictHostKeyChecking=no deployment.tar.gz ${{ env.SSH_USER }}@${{ env.EC2_HOST }}:/tmp/
+        
+        # Add debug commands to check files
         ssh -i deploy_key -o StrictHostKeyChecking=no ${{ env.SSH_USER }}@${{ env.EC2_HOST }} << 'ENDSSH'
-          # Create release directory
+          echo "Current directory: $(pwd)"
+          echo "Checking /tmp content:"
+          ls -la /tmp/deployment.tar.gz
+          
+          # Create and check release directory
           sudo mkdir -p $RELEASE_DIR
+          echo "Created directory: $RELEASE_DIR"
+          ls -la $RELEASE_DIR
           
-          # Extract deployment package
+          # Extract with verbose flag
           cd /tmp
-          sudo tar -xzf deployment.tar.gz -C $RELEASE_DIR
+          echo "Extracting archive..."
+          sudo tar -vxzf deployment.tar.gz -C $RELEASE_DIR
           
-          # Update symlinks
+          # Check extracted content
+          echo "Checking extracted content:"
+          ls -la $RELEASE_DIR
+          
+          # Update symlink
           sudo ln -sfn $RELEASE_DIR ${{ env.DEPLOY_PATH }}/current
+          echo "Updated symlink"
           
-          # Cleanup old releases (keep last 5)
+          # Cleanup old releases
           cd ${{ env.DEPLOY_PATH }}/releases && ls -t | tail -n +6 | xargs -r sudo rm -rf
           
-          # Cleanup deployment package
+          # Remove deployment package
           rm /tmp/deployment.tar.gz
-          
-          # Reload Nginx
-          sudo systemctl reload nginx
         ENDSSH
         
-        rm deploy_key
+        rm deploy_key  
