@@ -2,7 +2,7 @@ var onFetched = () => {
     initializeProfileData();
 }
 
-//getData(onFetched);
+getData(onFetched);
 
 document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("editProfileForm").addEventListener("submit", function (event) { 
@@ -74,4 +74,3 @@ function getUserIconElement(){
         }
     }
 }
-export { resetColors, resetIcons, selectColor, selectIcon, initializeProfileData, getUserColorElement, getUserIconElement };
