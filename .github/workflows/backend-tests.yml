@@ -32,6 +32,9 @@ jobs:
         with:
           node-version: "20"
 
+      - name: Clear Node.js cache
+        run: npm cache clean --force
+
       # Instalare minimala pentru generarea cache-ului la prima rulare
       - name: Install dependencies
         if: steps.cache-node-modules.outputs.cache-hit != 'true'
