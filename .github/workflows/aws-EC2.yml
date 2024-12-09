@@ -1,7 +1,7 @@
 name: Deploy to EC2
 on:
   workflow_run:
-    workflows: ["Node.js CI"]
+    workflows: ["Build Project","Node.js CI"]
     types:
       - completed
 env:
