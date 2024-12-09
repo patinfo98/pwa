@@ -1,11 +1,13 @@
 module.exports = {
-  testEnvironment: "node", // Specifies the test environment as Node.js (ideal for backend testing)
-  collectCoverage: true, // Enables code coverage reporting
-  coverageDirectory: "./coverage", // Defines the directory where coverage reports will be saved
+  testEnvironment: "node", // Ideal pentru backend
+  collectCoverage: true, // Activează raportarea coverage-ului
+  coverageDirectory: "./coverage", // Unde se salvează rapoartele coverage
   collectCoverageFrom: [
-    "js/**/*.js", // Includes all JavaScript files in the `js/` directory for coverage reporting
+    "*.js", // Include toate fișierele `.js` din rădăcina proiectului
+    "!*.test.js", // Exclude testele
+    "!jest.config.js", // Exclude fișierul de configurare
   ],
   testMatch: [
-    "**/tests/**/*.test.js", // Matches all test files in the `tests/` directory with the `.test.js` extension
+    "**/tests/**/*.test.js", // Include toate testele din directorul `tests/`
   ],
 };
