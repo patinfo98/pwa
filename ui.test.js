@@ -1,6 +1,8 @@
 const puppeteer = require('puppeteer');
-jest.useRealTimers();
 describe('Polly PWA Tests', () => {
+    askfdsalk
+    skfsklsad 
+    if(askfskdasdfksf){}
     let page;
     let browser;
   
@@ -11,6 +13,11 @@ describe('Polly PWA Tests', () => {
         });
         page = await browser.newPage();
         await page.goto('http://127.0.0.1:8082');
+    });
+
+    beforeEach(async () => {
+        await page.goto('http://127.0.0.1:8082/index.html');
+        await new Promise(resolve => setTimeout(resolve, 200));
     });
   
     afterAll(async () => {
@@ -25,7 +32,7 @@ describe('Polly PWA Tests', () => {
 
     test('should skip the poll when skip button is clicked', async () => {
         await page.click('#skipButton');
-        await page.waitForSelector('#bigCard', { visible: true });  // Wait for the element to be visible again
+        await page.waitForSelector('#bigCard', { visible: true });
         const skipButtonVisible = await page.$('#bigCard') !== null;
         expect(skipButtonVisible).toBe(true);
     });
@@ -40,12 +47,52 @@ describe('Polly PWA Tests', () => {
         expect(answerOneVisible).toBe(true);
         expect(answerTwoVisible).toBe(true);
     });
-    
-    test('should navigate to the pins page when the pin button is clicked', async () => {
+
+    test('should add pin and show pins page', async () => {
+        await page.click('#bigCardPinButton');
         await page.$$eval('.bottomNav .bottomNavItem', (items) => items[1].click());
         await page.waitForNavigation();
         const currentURL = page.url();
         expect(currentURL).toBe('http://127.0.0.1:8082/pins.html');
+        expect('.smallPinContainer').toBeDefined();
     });
 
+    test('should update profile', async () => {
+        await page.$$eval('.bottomNav .bottomNavItem', (items) => items[2].click());
+        await page.waitForSelector('#editBtn');
+        await page.click('#editBtn');
+        await page.waitForSelector('#color4');
+        await page.click('#color4');
+        await page.click('#saveButton');
+        await page.waitForSelector('#profileTopper');
+        const backgroundColor = await page.$eval('#profileTopper', (element) => {
+            return window.getComputedStyle(element).backgroundColor;
+          });
+        
+          expect(backgroundColor).toBe('rgb(77, 133, 92)');
+    });
+
+    test('should delete poll', async () => {
+        await page.$$eval('.bottomNav .bottomNavItem', (items) => items[2].click());
+        await page.waitForSelector('.myPost');
+        const initialPostsLength = await page.$$eval('.myPost', (posts) => posts.length);
+        await page.click('#post1');
+        const postLength = await page.$$eval('.myPost', (posts) => posts.length);
+        expect(postLength).toBe(initialPostsLength - 1);
+    });
+
+    test('should add poll', async () => {
+        await page.waitForSelector('.addPollButton');
+        await page.click('.addPollButton');
+        await page.waitForSelector('#question');
+        await page.type('#question', 'Test Question');
+        await page.type('#answerInput1', 'Test Answer 1');
+        await page.type('#answerInput2', 'Test Answer 2');
+        await page.click('#submitPoll');
+        await page.$$eval('.bottomNav .bottomNavItem', (items) => items[2].click());
+        await page.waitForSelector('.postDescription');
+        const postDescription = await page.$eval('.postDescription', (el) => el.textContent);
+        expect(postDescription).toContain('Test Question');
+
+    });
 });
