@@ -1,12 +1,12 @@
 name: Deploy to EC2
 on:
   workflow_run:
-    workflows: ["Build Project","Node.js CI"]
+    workflows: ["UI Test"]
     types:
       - completed
 env:
   AWS_REGION: eu-central-1
-  EC2_HOST: ec2-3-64-57-137.eu-central-1.compute.amazonaws.com
+  EC2_HOST: ec2-63-177-102-3.eu-central-1.compute.amazonaws.com
   DEPLOY_PATH: /var/www/pwa
   SSH_USER: ec2-user
   AWS_PLATFORM: linux/amd64

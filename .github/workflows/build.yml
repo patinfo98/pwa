@@ -2,13 +2,10 @@ name: Build Project
 
 on:
   push:
-    branches:
-      - main
-      - sj
+    branches: ["main"]
   pull_request:
-    branches:
-      - main
-      - sj
+    branches: ["main"]
+
 jobs:
   build:
     runs-on: ubuntu-latest
