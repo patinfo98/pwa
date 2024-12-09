@@ -69,12 +69,31 @@ var filesToCache = [
 //					Saving to web storage won't work, because web storage is synchronous.
 //					We open a cache with a given name, then add all the files our app uses to the cache, so they can be downloaded 
 //          next time (identified by request URL).
+// self.addEventListener("install", event => {
+//   console.log("Service Worker Lab 05 PWA installing.");
+//   event.waitUntil(
+//       caches.open(cacheName).then(function(cache) {
+//         return cache.addAll(filesToCache);
+//       })
+//   );
+// });
+
 self.addEventListener("install", event => {
   console.log("Service Worker Lab 05 PWA installing.");
   event.waitUntil(
-      caches.open(cacheName).then(function(cache) {
-        return cache.addAll(filesToCache);
-      })
+      caches.open(cacheName)
+          .then(cache => {
+            // Add files one by one to identify which file is causing the error
+            return Promise.all(
+                filesToCache.map(url => {
+                  return cache.add(url).catch(err => {
+                    console.error(`Failed to cache: ${url}`, err);
+                    // Continue with other files even if one fails
+                    return Promise.resolve();
+                  });
+                })
+            );
+          })
   );
 });
 
