@@ -116,3 +116,6 @@ Location: `/etc/nginx/ssl/`
     - Check SSH key permissions
     - Validate AWS IAM permissions
 
+## Alternative Approach: ECS Continuous Deployment
+
+For an alternative approach using Amazon ECS for containerized deployments, please refer to the [ECS CD Pipeline Documentation](./.doc/ECS.md), where we explain how to leverage Amazon ECS and GitHub Actions to automate your deployments on a serverless environment using AWS Fargate.
