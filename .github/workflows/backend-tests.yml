@@ -27,11 +27,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node-
 
-      
-      - name: Debug cache hit
-        run: echo "Cache hit: ${{ steps.cache-node-modules.outputs.cache-hit }}"
-
-
       - name: Use Node.js
         uses: actions/setup-node@v3
         with:
@@ -42,12 +37,10 @@ jobs:
 
       # Instalare minimala pentru generarea cache-ului la prima rulare
       - name: Install dependencies
-        if: steps.cache-node-modules.outputs.cache-hit != 'true'
         run: npm ci
 
-      # Rulează teste și coverage doar dacă cache-ul există
+      # Rulează teste și coverage
       - name: Run all tests with coverage
-        if: steps.cache-node-modules.outputs.cache-hit == 'true'
         run: npx jest --ci --coverage
 
       # Afișează un sumar coverage în logs
