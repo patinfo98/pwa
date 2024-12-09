@@ -1,4 +1,5 @@
 # Continuous Deployment Documentation
+Stefan Jovic
 
 ## Infrastructure Overview
 The application is deployed on an AWS EC2 instance using Nginx as the web server. The deployment process is automated via GitHub Actions.
