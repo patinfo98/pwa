@@ -5,12 +5,14 @@ on:
     workflows: ["Node.js CI"]
     types:
       - completed
+    branches: [main]
 env:
   AWS_REGION: eu-central-1
   EC2_HOST: ec2-3-64-57-137.eu-central-1.compute.amazonaws.com
   DEPLOY_PATH: /var/www/pwa
   SSH_USER: ec2-user
   AWS_PLATFORM: linux/amd64
+  NODE_ENV: production
 
 permissions:
   contents: read
@@ -20,6 +22,7 @@ jobs:
     name: Deploy
     runs-on: ubuntu-latest
     environment: production
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
 
     steps:
     - name: Checkout code
