@@ -28,7 +28,7 @@ jobs:
             ${{ runner.os }}-node-
 
       - name: Use Node.js
-        uses: actions/setup-node@v3git
+        uses: actions/setup-node@v3
         with:
           node-version: "20"
 
