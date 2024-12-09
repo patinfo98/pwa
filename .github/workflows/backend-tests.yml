@@ -1,6 +1,5 @@
-name: Backend Tests
+name: Test and Cache Setup
 
-# Trigger the workflow on every push or pull request to the `main` branch
 on:
   push:
     branches:
@@ -13,34 +12,40 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-latest # The virtual machine to run the workflow on (Ubuntu)
+    runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Check out the repository code from GitHub
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # Step 2: Set up Node.js to use the specified version
-      - name: Set up Node.js
+      - name: Cache Node.js modules
+        id: cache-node-modules
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Use Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: "20" # Specify the version of Node.js to use
+          node-version: "20"
 
-      # Step 3: Install dependencies from `package.json`
+      # Instalare minimala pentru generarea cache-ului la prima rulare
       - name: Install dependencies
+        if: steps.cache-node-modules.outputs.cache-hit != 'true'
         run: npm ci
 
-      - name: Fix Jest permissions
-        run: chmod +x ./node_modules/.bin/jest
+      # Rulează teste și coverage doar dacă cache-ul există
+      - name: Run all tests with coverage
+        if: steps.cache-node-modules.outputs.cache-hit == 'true'
+        run: npm run test:ci
 
-      # Step 4: Run Jest tests and generate coverage reports
-      - name: Run backend tests
-        run: npx http-server -p 8082 &
-          npx wait-on http://127.0.0.1:8082
-          npx jest --coverage
-      # Step 5: Upload the coverage report as an artifact
+      # Salvează raportul de coverage doar după prima rulare completă
       - name: Upload coverage report
+        if: steps.cache-node-modules.outputs.cache-hit == 'true'
         uses: actions/upload-artifact@v3
         with:
-          name: coverage-report # The name of the artifact
-          path: coverage/ # The path to the coverage report directory
+          name: coverage-report
+          path: coverage/lcov-report
