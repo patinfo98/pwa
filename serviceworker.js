@@ -70,11 +70,28 @@ var filesToCache = [
 //					We open a cache with a given name, then add all the files our app uses to the cache, so they can be downloaded 
 //          next time (identified by request URL).
 self.addEventListener("install", event => {
-    console.log("Service Worker Lab 05 PWA installing.");
+    console.log("[SW] Installing Service Worker");
     event.waitUntil(
-        caches.open(cacheName).then(function (cache) {
-            return cache.addAll(filesToCache);
-        })
+        caches.open(cacheName)
+            .then(cache => {
+                console.log("[SW] Cache opened, starting to add files");
+                return Promise.allSettled(
+                    filesToCache.map(url => {
+                        console.log("[SW] Trying to cache:", url);
+                        return cache.add(url)
+                            .then(() => {
+                                console.log("[SW] Successfully cached:", url);
+                            })
+                            .catch(error => {
+                                console.error("[SW] Failed to cache:", url, error);
+                                return Promise.resolve();
+                            });
+                    })
+                );
+            })
+            .then(() => {
+                console.log("[SW] Installation complete");
+            })
     );
 });
 
@@ -88,11 +105,17 @@ self.addEventListener("activate", event => {
 //					      Allows to respond to every single request with any response we want: prepared by the Service Worker, 
 //                taken from cache, modified if needed.
 self.addEventListener('fetch', event => {
-    console.log("Service Worker Lab 05 PWA fetching.");
+    console.log('[SW] Fetch event for:', event.request.url);
     event.respondWith(
-        caches.match(event.request).then(function (response) {
-            return response || fetch(event.request);
-        })
+        caches.match(event.request)
+            .then(response => {
+                if (response) {
+                    console.log('[SW] Found in cache:', event.request.url);
+                    return response;
+                }
+                console.log('[SW] Not found in cache, fetching:', event.request.url);
+                return fetch(event.request);
+            })
     );
 });
 
