@@ -116,3 +116,9 @@ Location: `/etc/nginx/ssl/`
     - Check SSH key permissions
     - Validate AWS IAM permissions
 
+## Backend Test
+first
+npm install --save-dev ts-jest
+npm install --save-dev jest-environment-jsdom
+
+
