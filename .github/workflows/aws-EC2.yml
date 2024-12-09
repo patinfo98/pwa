@@ -63,27 +63,27 @@ jobs:
         scp -i deploy_key -o StrictHostKeyChecking=no deployment.tar.gz ${{ env.SSH_USER }}@${{ env.EC2_HOST }}:/tmp/
         
         # Execute deployment commands
-        ssh -i deploy_key -o StrictHostKeyChecking=no ${{ env.SSH_USER }}@${{ env.EC2_HOST }} << EOF
+        ssh -i deploy_key -o StrictHostKeyChecking=no ${{ env.SSH_USER }}@${{ env.EC2_HOST }} << 'EOF'
           # Set timestamp
-          TIMESTAMP=\$(date +%Y%m%d_%H%M%S)
-          RELEASE_DIR=${{ env.DEPLOY_PATH }}/releases/\$TIMESTAMP
+          TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+          RELEASE_DIR=${{ env.DEPLOY_PATH }}/releases/$TIMESTAMP
           
-          echo "Creating directory: \$RELEASE_DIR"
-          sudo mkdir -p \$RELEASE_DIR
+          echo "Creating directory: $RELEASE_DIR"
+          sudo mkdir -p $RELEASE_DIR
           
           echo "Extracting files..."
           cd /tmp
-          sudo tar -xzf deployment.tar.gz -C \$RELEASE_DIR
+          sudo tar -xzf deployment.tar.gz -C $RELEASE_DIR
           
           echo "Setting permissions..."
-          sudo chown -R nginx:nginx \$RELEASE_DIR
+          sudo chown -R nginx:nginx $RELEASE_DIR
           
           echo "Updating symlink..."
-          sudo ln -sfn \$RELEASE_DIR ${{ env.DEPLOY_PATH }}/current
+          sudo ln -sfn $RELEASE_DIR ${{ env.DEPLOY_PATH }}/current
           
           echo "Cleaning up..."
           cd ${{ env.DEPLOY_PATH }}/releases && ls -t | tail -n +6 | xargs -r sudo rm -rf
           rm /tmp/deployment.tar.gz
-EOF
+        EOF
         
         rm deploy_key
