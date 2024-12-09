@@ -59,44 +59,31 @@ jobs:
         echo "$SSH_PRIVATE_KEY" > deploy_key
         chmod 600 deploy_key
         
-        # Create release directory with timestamp
-        TIMESTAMP=$(date +%Y%m%d_%H%M%S)
-        RELEASE_DIR=${{ env.DEPLOY_PATH }}/releases/$TIMESTAMP
+        # Upload deployment package
+        scp -i deploy_key -o StrictHostKeyChecking=no deployment.tar.gz ${{ env.SSH_USER }}@${{ env.EC2_HOST }}:/tmp/
         
-        echo "Uploading to ${{ env.SSH_USER }}@${{ env.EC2_HOST }}"
-        
-        # Upload with verbose flag
-        scp -v -i deploy_key -o StrictHostKeyChecking=no deployment.tar.gz ${{ env.SSH_USER }}@${{ env.EC2_HOST }}:/tmp/
-        
-        # Add debug commands to check files
-        ssh -i deploy_key -o StrictHostKeyChecking=no ${{ env.SSH_USER }}@${{ env.EC2_HOST }} << 'ENDSSH'
-          echo "Current directory: $(pwd)"
-          echo "Checking /tmp content:"
-          ls -la /tmp/deployment.tar.gz
+        # Execute deployment commands
+        ssh -i deploy_key -o StrictHostKeyChecking=no ${{ env.SSH_USER }}@${{ env.EC2_HOST }} << EOF
+          # Set timestamp
+          TIMESTAMP=\$(date +%Y%m%d_%H%M%S)
+          RELEASE_DIR=${{ env.DEPLOY_PATH }}/releases/\$TIMESTAMP
           
-          # Create and check release directory
-          sudo mkdir -p $RELEASE_DIR
-          echo "Created directory: $RELEASE_DIR"
-          ls -la $RELEASE_DIR
+          echo "Creating directory: \$RELEASE_DIR"
+          sudo mkdir -p \$RELEASE_DIR
           
-          # Extract with verbose flag
+          echo "Extracting files..."
           cd /tmp
-          echo "Extracting archive..."
-          sudo tar -vxzf deployment.tar.gz -C $RELEASE_DIR
+          sudo tar -xzf deployment.tar.gz -C \$RELEASE_DIR
           
-          # Check extracted content
-          echo "Checking extracted content:"
-          ls -la $RELEASE_DIR
+          echo "Setting permissions..."
+          sudo chown -R nginx:nginx \$RELEASE_DIR
           
-          # Update symlink
-          sudo ln -sfn $RELEASE_DIR ${{ env.DEPLOY_PATH }}/current
-          echo "Updated symlink"
+          echo "Updating symlink..."
+          sudo ln -sfn \$RELEASE_DIR ${{ env.DEPLOY_PATH }}/current
           
-          # Cleanup old releases
+          echo "Cleaning up..."
           cd ${{ env.DEPLOY_PATH }}/releases && ls -t | tail -n +6 | xargs -r sudo rm -rf
-          
-          # Remove deployment package
           rm /tmp/deployment.tar.gz
-        ENDSSH
+EOF
         
-        rm deploy_key  
+        rm deploy_key
