@@ -28,7 +28,7 @@ jobs:
             ${{ runner.os }}-node-
 
       - name: Use Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v3git
         with:
           node-version: "20"
 
@@ -43,7 +43,7 @@ jobs:
       # Rulează teste și coverage doar dacă cache-ul există
       - name: Run all tests with coverage
         if: steps.cache-node-modules.outputs.cache-hit == 'true'
-        run: npm run test:ci
+        run: npx jest --ci --coverage
 
       # Salvează raportul de coverage doar după prima rulare completă
       - name: Upload coverage report

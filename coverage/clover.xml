@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1733751343657" clover="3.2.0">
-  <project timestamp="1733751343657" name="All files">
+<coverage generated="1733761791385" clover="3.2.0">
+  <project timestamp="1733761791386" name="All files">
     <metrics statements="350" coveredstatements="3" conditionals="79" coveredconditionals="0" methods="87" coveredmethods="2" elements="516" coveredelements="5" complexity="0" loc="350" ncloc="350" packages="1" files="11" classes="11"/>
     <file name="addpoll.js" path="C:\Studium3\ContDel\pwa\addpoll.js">
       <metrics statements="21" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="6" coveredmethods="0"/>
