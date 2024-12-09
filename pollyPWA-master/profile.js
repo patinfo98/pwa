@@ -2,7 +2,6 @@ var onFetched = () => {
     reloadPosts();
     setProfileData();
 }
-
 getData(onFetched);
 
 function displayPosts(){
