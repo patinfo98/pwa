@@ -1,160 +1,118 @@
-# project plan
+# Continuous Deployment Documentation
 
-## continious delivery workflow
-- feature branches
--- pull requests with one approval
-- documentation
-- build automation
-- test automation 
-- continious deployment
-- security 
--- (no upload of passwords/keys)
--- https
+## Infrastructure Overview
+The application is deployed on an AWS EC2 instance using Nginx as the web server. The deployment process is automated via GitHub Actions.
 
-## division of tasks
-- testing: 
-    -- frontend tests (Selenium): Patrick
-    -- backend tests: Dominik
-- build automation (Github Actions): Susanne
-- test automation: Dana
-- server: Stefan
+### Server Structure
+- **Base Path**: `/var/www/pwa/`
+    - `current/` -> Symlink to latest release
+    - `releases/` -> Contains versioned releases
+    - `logs/` -> Application logs
 
-# SSL Certificate Implementation for PWA
+### SSL Configuration
+SSL certificates are stored in `/etc/nginx/ssl/`:
+- `certificate.crt` - Main certificate
+- `ca_bundle.crt` - Certificate chain
+- `private.key` - Private key
 
-## Overview
-This documentation covers the implementation of SSL/TLS encryption and caching strategies for a Progressive Web Application (PWA) running on an AWS EC2 instance with Nginx.
+## Deployment Process
 
-## SSL Certificate Implementation
-### Certificate Acquisition
-1. Used ZeroSSL for certificate generation
-2. Verified domain ownership through HTTP validation method
-3. Generated three essential files:
-    - `certificate.crt`: Main SSL certificate
-    - `private.key`: Private key file
-    - `ca_bundle.crt`: Certificate Authority bundle
+### Release Strategy
+- Each deployment creates a new timestamped directory in `/var/www/pwa/releases/`
+- The `current` symlink points to the latest release
+- Only the last 5 releases are kept for rollback purposes
 
-### Certificate Installation
-1. Created SSL directory on EC2:
+### GitHub Actions Workflow
+The deployment is triggered automatically after successful completion of:
+- "Build Project" workflow
+- "Node.js CI" workflow
+
+#### Workflow Steps
+1. **Environment Setup**
+    - Runs on Ubuntu latest
+    - Uses Node.js 18
+    - Uses npm cache for faster installations
+
+2. **Build Process**
    ```bash
-   sudo mkdir -p /etc/nginx/ssl
+   npm ci
+   NODE_ENV=production npm run build
    ```
 
-2. Installed certificates:
-   ```bash
-   sudo mv certificate.crt /etc/nginx/ssl/
-   sudo mv private.key /etc/nginx/ssl/
-   sudo mv ca_bundle.crt /etc/nginx/ssl/
-   ```
+3. **Deployment Package**
+    - Creates `deployment.tar.gz` from the `dist` directory
 
-3. Set proper permissions:
-   ```bash
-   sudo chmod 644 /etc/nginx/ssl/certificate.crt
-   sudo chmod 644 /etc/nginx/ssl/ca_bundle.crt
-   sudo chmod 600 /etc/nginx/ssl/private.key
-   ```
+4. **AWS Authentication**
+    - Configures AWS credentials for EC2 access
+    - Uses AWS region: eu-central-1
 
-## Nginx Configuration
-### SSL Settings
-```nginx
-ssl_certificate /etc/nginx/ssl/certificate.crt;
-ssl_certificate_key /etc/nginx/ssl/private.key;
-ssl_trusted_certificate /etc/nginx/ssl/ca_bundle.crt;
+5. **EC2 Deployment**
+    - Uploads package to `/tmp/` on EC2
+    - Creates timestamped release directory
+    - Extracts files and sets nginx:nginx ownership
+    - Updates `current` symlink
+    - Maintains only last 5 releases
 
-ssl_protocols TLSv1.2 TLSv1.3;
-ssl_prefer_server_ciphers on;
-ssl_ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256;
-```
+### Security
+- Uses SSH key-based authentication
+- Implements StrictHostKeyChecking
+- Temporary files are cleaned up after deployment
 
-### Security Headers
-```nginx
-add_header X-Content-Type-Options "nosniff";
-add_header X-Frame-Options "SAMEORIGIN";
-add_header X-XSS-Protection "1; mode=block";
-```
+## Server Configuration
 
-## Caching Strategies
-Implemented different caching strategies for various file types:
+### File Permissions
+- Application files: `nginx:nginx`
+- SSL certificates:
+    - Certificate files: `nginx:nginx` (read-only)
+    - Private key: `nginx:nginx` (read-only, restricted)
 
-### Dynamic Content
-- Service Worker:
-  ```nginx
-  location = /serviceworker.js {
-      add_header Cache-Control "no-cache, no-store, must-revalidate";
-      expires 0;
-  }
-  ```
-- JSON Files:
-  ```nginx
-  location ~ \.json$ {
-      add_header Cache-Control "no-cache, must-revalidate";
-      expires 0;
-  }
-  ```
+## Required Environment Variables
 
-### Static Content
-- Images and SVGs:
-  ```nginx
-  location /img/ {
-      add_header Cache-Control "public, max-age=31536000, immutable";
-      expires 365d;
-  }
-  ```
-- JavaScript and CSS:
-  ```nginx
-  location ~* \.(js|css)$ {
-      add_header Cache-Control "public, max-age=86400, must-revalidate";
-      expires 1d;
-  }
-  ```
+### GitHub Actions Secrets
+- `AWS_ACCESS_KEY_ID` - AWS access key
+- `AWS_SECRET_ACCESS_KEY` - AWS secret key
+- `SSH_PRIVATE_KEY` - SSH private key for EC2 access
 
-### PWA Specific
-- Manifest:
-  ```nginx
-  location = /manifest.json {
-      add_header Cache-Control "public, max-age=3600";
-      expires 1h;
-  }
-  ```
-
-## Performance Optimizations
-1. HTTP/2 enabled
-2. GZIP compression:
-   ```nginx
-   gzip on;
-   gzip_types text/plain text/css application/json application/javascript;
-   gzip_min_length 1000;
-   ```
-
-## Testing and Verification
-1. SSL Configuration Test:
-   ```bash
-   sudo nginx -t
-   ```
-
-2. Certificate Verification:
-   ```bash
-   openssl x509 -in /etc/nginx/ssl/certificate.crt -text -noout
-   ```
-
-3. Key Match Verification:
-   ```bash
-   openssl rsa -in /etc/nginx/ssl/private.key -check
-   ```
+### Environment Variables
+- `AWS_REGION: eu-central-1`
+- `EC2_HOST: ec2-3-64-57-137.eu-central-1.compute.amazonaws.com`
+- `DEPLOY_PATH: /var/www/pwa`
+- `SSH_USER: ec2-user`
+- `AWS_PLATFORM: linux/amd64`
 
 ## Maintenance
-- Certificate valid for 90 days
-- Set up automatic renewal through ZeroSSL
-- Monitor certificate expiration
-- Regular security updates
 
-## Security Considerations
-1. TLS 1.2 and 1.3 only (older versions disabled)
-2. Strong cipher suite configuration
-3. HTTP automatically redirects to HTTPS
-4. Secure headers implemented
-5. Private key permissions restricted to nginx user
+### SSL Certificates
+Location: `/etc/nginx/ssl/`
+- Monitor certificate expiration dates
+- Ensure proper permissions are maintained
+- Keep backup of certificates
 
-## Additional Information
-The complete configuration can be found in:
-- `/etc/nginx/conf.d/pwa.conf`
-- Certificates in `/etc/nginx/ssl/`
+### Release Management
+- Automatic cleanup keeps last 5 releases
+- Manual rollback possible by updating `current` symlink
+- Release directory format: `YYYYMMDD_HHMMSS`
+
+## Rollback Procedure
+1. SSH into the server
+2. Navigate to `/var/www/pwa/`
+3. List available releases in `releases/` directory
+4. Update symlink to desired release:
+   ```bash
+   ln -sfn /var/www/pwa/releases/[RELEASE_TIMESTAMP] /var/www/pwa/current
+   ```
+
+## Troubleshooting
+
+### Common Issues
+1. Failed Deployment
+    - Check GitHub Actions logs
+    - Verify AWS credentials
+    - Ensure SSH key is valid
+    - Check disk space on EC2
+
+2. Permission Issues
+    - Verify nginx user ownership
+    - Check SSH key permissions
+    - Validate AWS IAM permissions
+
