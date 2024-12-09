@@ -33,6 +33,9 @@ jobs:
     - name: Build
       run: |
         NODE_ENV=production npm run build
+        # Kopiere Bilder ins dist-Verzeichnis
+        mkdir -p dist/img
+        cp -r img/* dist/img/
         echo "Checking build output:"
         ls -la dist/
 
