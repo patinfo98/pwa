@@ -48,3 +48,24 @@ The GitHub Actions workflow is configured to automatically run the following:
 - **Scalability:** ECS with Fargate scales automatically based on the number of tasks running, so you don’t need to worry about scaling the infrastructure.
 - **Cost Efficiency:** You only pay for the vCPU and memory used by your containers, reducing costs compared to running EC2 instances continuously.
 - **Simplified Deployment:** The pipeline automates the deployment process, ensuring that the latest changes are always deployed with minimal effort.
+
+```mermaid
+flowchart TD
+    A[Code Push to GitHub] --> B[GitHub Action Triggered]
+    B --> C[Build Docker Image]
+    C --> D[Push Docker Image to Amazon ECR]
+    D --> E[Update ECS Task Definition]
+    E --> F[Deploy to ECS Fargate]
+    F --> G[Application Available via Public IP/Load Balancer]
+
+    style A fill:#4CAF50,stroke:#ffffff,stroke-width:2px;
+    style B fill:#2196F3,stroke:#ffffff,stroke-width:2px;
+    style C fill:#FF9800,stroke:#ffffff,stroke-width:2px;
+    style D fill:#9C27B0,stroke:#ffffff,stroke-width:2px;
+    style E fill:#FF5722,stroke:#ffffff,stroke-width:2px;
+    style F fill:#607D8B,stroke:#ffffff,stroke-width:2px;
+    style G fill:#8BC34A,stroke:#ffffff,stroke-width:2px;
+
+    classDef startEnd fill:#8BC34A,stroke:#ffffff,stroke-width:2px;
+    class A,G startEnd;
+```
