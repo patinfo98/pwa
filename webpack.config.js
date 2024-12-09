@@ -67,11 +67,27 @@ module.exports = {
         }),
         new CopyWebpackPlugin({
             patterns: [
-                { from: path.resolve(__dirname, 'data_polls.json'), to: 'data_polls.json' }, 
-                { from: path.resolve(__dirname, 'user.json'), to: 'user.json' },
-                { from: 'serviceworker.js', to: 'serviceworker.js' },
-                { from: 'manifest.json', to: 'manifest.json' },
-        
+                {
+                    from: path.resolve(__dirname, 'data_polls.json'),
+                    to: 'data_polls.json'
+                },
+                {
+                    from: path.resolve(__dirname, 'user.json'),
+                    to: 'user.json'
+                },
+                {
+                    from: 'serviceworker.js',
+                    to: 'serviceworker.js'
+                },
+                {
+                    from: 'manifest.json',
+                    to: 'manifest.json'
+                },
+                // Add PWA icon files explicitly
+                {
+                    from: 'img/lab05pwa*.png',
+                    to: 'img/[name][ext]'
+                }
             ],
         }),
     ],

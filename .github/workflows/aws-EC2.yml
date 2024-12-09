@@ -1,8 +1,7 @@
 name: Deploy to EC2
-
 on:
   workflow_run:
-    workflows: ["Node.js CI"]
+    workflows: ["Build Project","Node.js CI"]
     types:
       - completed
 env:
@@ -11,16 +10,13 @@ env:
   DEPLOY_PATH: /var/www/pwa
   SSH_USER: ec2-user
   AWS_PLATFORM: linux/amd64
-
 permissions:
   contents: read
-
 jobs:
   deploy:
     name: Deploy
     runs-on: ubuntu-latest
     environment: production
-
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
@@ -35,7 +31,13 @@ jobs:
       run: npm ci
 
     - name: Build
-      run: npm run build
+      run: |
+        NODE_ENV=production npm run build
+        # Kopiere Bilder ins dist-Verzeichnis
+        mkdir -p dist/img
+        cp -r img/* dist/img/
+        echo "Checking build output:"
+        ls -la dist/
 
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1
@@ -46,43 +48,45 @@ jobs:
 
     - name: Generate deployment package
       run: |
-        TIMESTAMP=$(date +%Y%m%d_%H%M%S)
-        tar -czf deployment.tar.gz dist/* # Replace 'dist' with your build output directory
+        cd dist
+        tar -czf ../deployment.tar.gz .
 
     - name: Deploy to EC2
       env:
         SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
       run: |
+        # Debug: Prüfe ob tar-Datei existiert
+        ls -la deployment.tar.gz
+        
         # Write the SSH key to a file
         echo "$SSH_PRIVATE_KEY" > deploy_key
         chmod 600 deploy_key
         
-        # Create release directory with timestamp
-        TIMESTAMP=$(date +%Y%m%d_%H%M%S)
-        RELEASE_DIR=${{ env.DEPLOY_PATH }}/releases/$TIMESTAMP
-        
-        # Upload and deploy
+        # Upload deployment package
         scp -i deploy_key -o StrictHostKeyChecking=no deployment.tar.gz ${{ env.SSH_USER }}@${{ env.EC2_HOST }}:/tmp/
         
-        ssh -i deploy_key -o StrictHostKeyChecking=no ${{ env.SSH_USER }}@${{ env.EC2_HOST }} << 'ENDSSH'
-          # Create release directory
+        # Execute deployment commands
+        ssh -i deploy_key -o StrictHostKeyChecking=no ${{ env.SSH_USER }}@${{ env.EC2_HOST }} << 'EOF'
+          # Set timestamp
+          TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+          RELEASE_DIR=${{ env.DEPLOY_PATH }}/releases/$TIMESTAMP
+          
+          echo "Creating directory: $RELEASE_DIR"
           sudo mkdir -p $RELEASE_DIR
           
-          # Extract deployment package
+          echo "Extracting files..."
           cd /tmp
           sudo tar -xzf deployment.tar.gz -C $RELEASE_DIR
           
-          # Update symlinks
+          echo "Setting permissions..."
+          sudo chown -R nginx:nginx $RELEASE_DIR
+          
+          echo "Updating symlink..."
           sudo ln -sfn $RELEASE_DIR ${{ env.DEPLOY_PATH }}/current
           
-          # Cleanup old releases (keep last 5)
+          echo "Cleaning up..."
           cd ${{ env.DEPLOY_PATH }}/releases && ls -t | tail -n +6 | xargs -r sudo rm -rf
-          
-          # Cleanup deployment package
           rm /tmp/deployment.tar.gz
-          
-          # Reload Nginx
-          sudo systemctl reload nginx
-        ENDSSH
+        EOF
         
         rm deploy_key
