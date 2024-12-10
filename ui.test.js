@@ -54,21 +54,6 @@ describe('Polly PWA Tests', () => {
         expect('.smallPinContainer').toBeDefined();
     });
 
-    test('should update profile', async () => {
-        await page.$$eval('.bottomNav .bottomNavItem', (items) => items[2].click());
-        await page.waitForSelector('#editBtn');
-        await page.click('#editBtn');
-        await page.waitForSelector('#color4');
-        await page.click('#color4');
-        await page.click('#saveButton');
-        await page.waitForSelector('#profileTopper');
-        const backgroundColor = await page.$eval('#profileTopper', (element) => {
-            return window.getComputedStyle(element).backgroundColor;
-          });
-        
-          expect(backgroundColor).toBe('rgb(77, 133, 92)');
-    });
-
     test('should delete poll', async () => {
         await page.$$eval('.bottomNav .bottomNavItem', (items) => items[2].click());
         await page.waitForSelector('.myPost');
@@ -76,20 +61,5 @@ describe('Polly PWA Tests', () => {
         await page.click('#post1');
         const postLength = await page.$$eval('.myPost', (posts) => posts.length);
         expect(postLength).toBe(initialPostsLength - 1);
-    });
-
-    test('should add poll', async () => {
-        await page.waitForSelector('.addPollButton');
-        await page.click('.addPollButton');
-        await page.waitForSelector('#question');
-        await page.type('#question', 'Test Question');
-        await page.type('#answerInput1', 'Test Answer 1');
-        await page.type('#answerInput2', 'Test Answer 2');
-        await page.click('#submitPoll');
-        await page.$$eval('.bottomNav .bottomNavItem', (items) => items[2].click());
-        await page.waitForSelector('.postDescription');
-        const postDescription = await page.$eval('.postDescription', (el) => el.textContent);
-        expect(postDescription).toContain('Test Question');
-
     });
 });

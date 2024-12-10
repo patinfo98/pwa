@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "description": "- feature branches\r -- pull requests with one approval\r - documentation\r - build automation\r - test automation \r - continious deployment\r - security \r -- (no upload of passwords/keys)\r -- https",
   "scripts": {
-    "test": "jest",
+    "test": "jest ./editProfile.test.js ./addpoll.test.js",
+    "test:noenv": "jest --testEnvironment=node ./ui.test.js",
     "start": "webpack serve --open",
     "build": "webpack"
   },

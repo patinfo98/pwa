@@ -24,4 +24,4 @@ jobs:
       run: |
         npx http-server -p 8082 &
         npx wait-on http://127.0.0.1:8082
-        npx jest ./ui.test.js
+        npm run test:noenv
