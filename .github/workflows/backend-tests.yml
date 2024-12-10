@@ -1,0 +1,57 @@
+name: Test and Cache Setup
+
+on:
+  push:
+    branches:
+      - main
+      - vlas
+  pull_request:
+    branches:
+      - main
+      - vlas
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Cache Node.js modules
+        id: cache-node-modules
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "20"
+
+      - name: Clear Node.js cache
+        run: npm cache clean --force
+
+      # Instalare minimala pentru generarea cache-ului la prima rulare
+      - name: Install dependencies
+        run: npm ci
+
+      # Rulează teste și coverage
+      - name: Run all tests with coverage
+        run: npx jest --ci --coverage
+
+      # Afișează un sumar coverage în logs
+      - name: Display coverage summary
+        if: steps.cache-node-modules.outputs.cache-hit == 'true'
+        run: npx jest --coverage --coverageReporters=text-summary
+
+      # Salvează raportul de coverage doar după prima rulare completă
+      - name: Upload coverage report
+        if: steps.cache-node-modules.outputs.cache-hit == 'true'
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage-report
+          path: coverage/lcov-report
