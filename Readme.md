@@ -117,8 +117,22 @@ Location: `/etc/nginx/ssl/`
     - Validate AWS IAM permissions
 
 ## Backend Test
-first
-npm install --save-dev ts-jest
-npm install --save-dev jest-environment-jsdom
 
+## Installs
 
+Istall these Packages before running the Tests
+
+    npm install --save-dev ts-jest
+    npm install --save-dev jest-environment-jsdom
+    npm install --save-dev babel-jest
+
+to run Backend-test run the command
+
+    npm test
+
+## Known Issues
+
+Structure of the code need the installation of babel, ts-jest and jest environment-jsdom
+
+Couldn't get around the error that the line  **getData(onFetched);** throws an error in the tests.
+To run the backend-tests the **getData(onFetched);** line in [addpoll.js](addpoll.js) and [editProfile.js](editProfile.js) must be removed or made to a comment.
