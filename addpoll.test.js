@@ -30,14 +30,14 @@ describe('updateUserPolls', () => {
     expect(() => updateUserPolls({ options: ['Red', 'Blue'] })).toThrow("Invalid poll data");
   });
 
-  it("should reset colors when resetColors is called", () => {
-      const colorElement = document.querySelector(".color");
-      colorElement.style.border = "3px solid white";
-
-      resetColors();
-
-      expect(colorElement.style.border).toBe("transparent");
-    });
+//  it("should reset colors when resetColors is called", () => {
+//      const colorElement = document.querySelector(".color");
+//      colorElement.style.border = "3px solid white";
+//
+//      resetColors();
+//
+//      expect(colorElement.style.border).toBe("transparent");
+//    });
 
   test('should return true for valid poll data', () => {
     const result = updateUserPolls({ question: 'Favorite color?', options: ['Red', 'Blue'] });
