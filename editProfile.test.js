@@ -8,8 +8,7 @@ import {
     getUserIconElement
 } from "./editProfile";
 
-  beforeEach(() => {
-    // Mock DOM elements
+    beforeEach(() => {
     document.body.innerHTML = `
       <form id="editProfileForm">
         <input type="text" id="nameInput" name="name">

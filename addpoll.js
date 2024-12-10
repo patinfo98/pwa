@@ -1,4 +1,4 @@
-getData();
+//getData();
 
 document.addEventListener("DOMContentLoaded", function () {
 
@@ -47,3 +47,5 @@ function setInputFieldColor(){
       color.style.backgroundColor = currentColor;
    })
 }
+
+export{ selectColor }
